@@ -128,20 +128,21 @@ def repairAssets(mergedList):
 				f.flush()
 
 def checkStatus(query):
-	connection = None
 	try:
 		connection = urllib2.urlopen(query)
+		data = json.loads(connection.read())
+		connection.close()
+		entries = data['entries']
+		if len(entries) > 0:
+			if entries[0]['status'] == "Processed":
+				return "Processed"
+			else: 
+				return entries[0]['status']	
+		return 'Not Published'
 	except urllib2.URLError:
 		print 'Timeout Error checking media '
-	data = json.loads(connection.read())
-	connection.close()
-	entries = data['entries']
-	if len(entries) > 0:
-		if entries[0]['status'] == "Processed":
-			return "Processed"
-		else: 
-			return entries[0]['status']	
-	return 'Not Published'
+		return 'ERROR CHECKING MEDIA'
+
 
 if __name__ == '__main__':
 	config = ConfigParser.ConfigParser()
